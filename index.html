@@ -1,18 +1,214 @@
-{
-  "day1": {
-    "title": "Day 1 — Opening",
-    "subtitle": "Sunday, 23 November 2025",
-    "slots": [
-      {
-        "time": "08:00–09:00",
-        "type": "sideevent",
-        "title": "Registration & badge collection",
-        "chair": "Conference Services",
-        "room": "Registration Area",
-        "notes": "Participants are invited to arrive early to avoid queues."
+  <script>
+    const scheduleGridContainer = document.getElementById("scheduleGridContainer");
+    const emptyState = document.getElementById("emptyState");
+    const scheduleTitle = document.getElementById("scheduleTitle");
+    const scheduleSubtitle = document.getElementById("scheduleSubtitle");
+
+    const dayTabs = document.querySelectorAll("#dayTabs .tab");
+    const trackFilter = document.getElementById("trackFilter");
+    const searchInput = document.getElementById("searchInput");
+
+    let currentDayKey = "day1";
+    let scheduleData = {}; // will be filled from remote API
+    const API_URL = "https://schedule.cop20.live/"; // adjust if your JSON is at another path
+
+    async function loadScheduleData() {
+      try {
+        // Show basic loading state
+        scheduleTitle.textContent = "Loading schedule…";
+        scheduleSubtitle.textContent = "";
+        scheduleGridContainer.innerHTML = "";
+        emptyState.style.display = "none";
+
+        const response = await fetch(API_URL, {
+          headers: {
+            "Accept": "application/json"
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to load schedule data: " + response.status);
+        }
+
+        const raw = await response.json();
+
+        // If your API already returns the same shape as the old scheduleData,
+        // you can just return `raw`. Otherwise, map it here.
+        scheduleData = transformRawToScheduleData(raw);
+
+        // Make sure currentDayKey exists; fall back to first key
+        if (!scheduleData[currentDayKey]) {
+          const firstKey = Object.keys(scheduleData)[0];
+          if (firstKey) {
+            currentDayKey = firstKey;
+            // also update the active tab if keys differ (optional)
+            dayTabs.forEach(tab => {
+              tab.classList.toggle(
+                "is-active",
+                tab.getAttribute("data-day") === currentDayKey
+              );
+            });
+          }
+        }
+
+        renderSchedule();
+      } catch (err) {
+        console.error(err);
+        scheduleTitle.textContent = "Error loading schedule";
+        scheduleSubtitle.textContent = "";
+        scheduleGridContainer.innerHTML = "";
+        emptyState.textContent = "Could not load the programme. Please try again later.";
+        emptyState.style.display = "block";
       }
-    ]
-  },
-  "day2": { ... },
-  "day3": { ... }
-}
+    }
+
+    // If needed, adapt the API result shape to our internal format here.
+    function transformRawToScheduleData(raw) {
+      // Example: if raw is already { day1: {title, subtitle, slots:[...]}, ... }
+      // simply return it:
+      return raw;
+
+      // If your real API is different, change this function, e.g.:
+      // const data = {};
+      // raw.days.forEach(day => {
+      //   data[day.key] = {
+      //     title: day.title,
+      //     subtitle: day.date,
+      //     slots: day.sessions.map(s => ({
+      //       time: s.time,
+      //       type: s.type,
+      //       title: s.title,
+      //       chair: s.chair,
+      //       room: s.room,
+      //       notes: s.notes
+      //     }))
+      //   };
+      // });
+      // return data;
+    }
+
+    function renderSchedule() {
+      const day = scheduleData[currentDayKey];
+      if (!day) {
+        scheduleGridContainer.innerHTML = "";
+        emptyState.textContent = "No schedule found for this day.";
+        emptyState.style.display = "block";
+        return;
+      }
+
+      scheduleTitle.innerHTML = day.title;
+      scheduleSubtitle.textContent = day.subtitle || "";
+
+      const searchText = (searchInput.value || "").toLowerCase().trim();
+      const track = trackFilter.value;
+
+      // Filter slots
+      let slots = day.slots || [];
+      slots = slots.filter(slot => {
+        const matchesTrack = track === "all" || slot.type === track;
+        const matchesText =
+          !searchText ||
+          (slot.title && slot.title.toLowerCase().includes(searchText)) ||
+          (slot.notes && slot.notes.toLowerCase().includes(searchText)) ||
+          (slot.room && slot.room.toLowerCase().includes(searchText));
+        return matchesTrack && matchesText;
+      });
+
+      if (slots.length === 0) {
+        scheduleGridContainer.innerHTML = "";
+        emptyState.style.display = "block";
+        emptyState.textContent = "No sessions match your filters. Try changing the day, type, or search text.";
+        return;
+      }
+
+      emptyState.style.display = "none";
+
+      const grid = document.createElement("div");
+      grid.className = "schedule-grid";
+
+      // Header row
+      const headerRow = document.createElement("div");
+      headerRow.className = "schedule-row";
+      headerRow.innerHTML = `
+        <div class="schedule-cell schedule-cell--head">Time</div>
+        <div class="schedule-cell schedule-cell--head">Session</div>
+        <div class="schedule-cell schedule-cell--head">Room / Notes</div>
+      `;
+      grid.appendChild(headerRow);
+
+      // Data rows
+      slots.forEach(slot => {
+        const row = document.createElement("div");
+        row.className = "schedule-row";
+        row.setAttribute("data-type", slot.type);
+
+        // Time cell
+        const timeCell = document.createElement("div");
+        timeCell.className = "schedule-cell";
+        timeCell.innerHTML = `
+          <div class="slot-time">${slot.time || ""}</div>
+        `;
+
+        // Session cell
+        const sessionCell = document.createElement("div");
+        sessionCell.className = "schedule-cell";
+        const typeClass =
+          slot.type === "plenary"
+            ? "slot-type--plenary"
+            : slot.type === "committee"
+            ? "slot-type--committee"
+            : "slot-type--sideevent";
+
+        const typeLabel =
+          slot.type === "plenary"
+            ? "Plenary"
+            : slot.type === "committee"
+            ? "Committee"
+            : "Side event";
+
+        sessionCell.innerHTML = `
+          <div class="slot-type ${typeClass}">
+            <span class="badge-dot"></span>
+            <span>${typeLabel}</span>
+          </div>
+          <div class="slot-title">${slot.title || ""}</div>
+          <div class="slot-meta">
+            <span>${slot.chair || "Chair TBC"}</span>
+          </div>
+        `;
+
+        // Room cell
+        const roomCell = document.createElement("div");
+        roomCell.className = "schedule-cell";
+        roomCell.innerHTML = `
+          <div class="slot-room">${slot.room || "Room TBC"}</div>
+          ${slot.notes ? `<div class="slot-meta">${slot.notes}</div>` : ""}
+        `;
+
+        row.appendChild(timeCell);
+        row.appendChild(sessionCell);
+        row.appendChild(roomCell);
+        grid.appendChild(row);
+      });
+
+      scheduleGridContainer.innerHTML = "";
+      scheduleGridContainer.appendChild(grid);
+    }
+
+    // Tab click
+    dayTabs.forEach(tab => {
+      tab.addEventListener("click", () => {
+        dayTabs.forEach(t => t.classList.remove("is-active"));
+        tab.classList.add("is-active");
+        currentDayKey = tab.getAttribute("data-day");
+        renderSchedule();
+      });
+    });
+
+    // Filters
+    trackFilter.addEventListener("change", renderSchedule);
+    searchInput.addEventListener("input", renderSchedule);
+
+    // Initial load from remote API
+    loadScheduleData();
+  </script>
