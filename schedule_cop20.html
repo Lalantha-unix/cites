@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>CITES – Meeting Schedule</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <!-- Google Font -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --card-bg: #020617;
+      --accent: #22c55e;
+      --accent-soft: rgba(34, 197, 94, 0.12);
+      --text: #f9fafb;
+      --text-soft: #9ca3af;
+      --border-soft: rgba(148, 163, 184, 0.2);
+      --chip-bg: rgba(15, 23, 42, 0.8);
+      --shadow-soft: 0 24px 60px rgba(15, 23, 42, 0.8);
+      --radius-xl: 1.5rem;
+      --radius-lg: 1rem;
+      --radius-md: 0.75rem;
+      --transition-fast: 150ms ease-out;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at top, #1f2937 0, #020617 45%, #020617 100%);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    .page {
+      width: 100%;
+      max-width: 1200px;
+      margin-inline: auto;
+    }
+
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(8, 47, 73, 0.95));
+      border-radius: var(--radius-xl);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      padding: 24px 24px 20px;
+      margin-bottom: 20px;
+      box-shadow: var(--shadow-soft);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .header::before {
+      content: "";
+      position: absolute;
+      inset: -80px;
+      background:
+        radial-gradient(circle at top left, rgba(56, 189, 248, 0.32), transparent 60%),
+        radial-gradient(circle at bottom right, rgba(22, 163, 74, 0.25), transparent 60%);
+      opacity: 0.9;
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    .header-inner {
+      position: relative;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 16px;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .header-main {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
+
+    /* circular logo image 
+    .logo-image {
+      width: 64px;
+      height: 64px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9), 0 12px 30px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    } 
+
+    .logo-image img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      border-radius: 999px;
+    }*/
+/* square logo image */
+/* header logo – keep original shape */
+.logo-image {
+  /* no fixed square box */
+  width: auto;
+  height: auto;
+  border-radius: 0;
+  overflow: visible;
+}
+
+.logo-image img {
+  height: 56px;          /* adjust this to make it bigger/smaller */
+  width: auto;           /* keep original aspect ratio */
+  object-fit: contain;
+  border-radius: 0;      /* no rounding */
+  display: block;
+}
+}
+
+    .header-text h1 {
+      font-size: clamp(1.5rem, 2vw, 1.9rem);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+
+    .header-text h1 span {
+      opacity: 0.6;
+      font-weight: 400;
+    }
+
+    .header-subtitle {
+      margin-top: 4px;
+      color: var(--text-soft);
+      font-size: 0.88rem;
+    }
+
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 10px;
+    }
+
+    .meta-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.9);
+      border: 1px solid rgba(148, 163, 184, 0.3);
+      font-size: 0.78rem;
+      color: var(--text-soft);
+      backdrop-filter: blur(14px);
+    }
+
+    .meta-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 12px rgba(34, 197, 94, 0.9);
+    }
+
+    .header-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .btn-primary {
+      border-radius: 999px;
+      padding: 8px 16px;
+      border: none;
+      background: linear-gradient(135deg, var(--accent), #15803d);
+      color: #022c22;
+      font-weight: 600;
+      font-size: 0.85rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 0 14px 30px rgba(22, 163, 74, 0.55);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast), filter var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-1px);
+      filter: brightness(1.05);
+      box-shadow: 0 20px 40px rgba(22, 163, 74, 0.65);
+    }
+
+    .btn-ghost {
+      border-radius: 999px;
+      padding: 8px 14px;
+      border: 1px solid rgba(148, 163, 184, 0.5);
+      background: rgba(15, 23, 42, 0.8);
+      color: var(--text-soft);
+      font-weight: 500;
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      backdrop-filter: blur(20px);
+      transition: background var(--transition-fast), border-color var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
+      white-space: nowrap;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(15, 23, 42, 0.95);
+      border-color: rgba(148, 163, 184, 0.9);
+      color: #e5e7eb;
+      transform: translateY(-1px);
+    }
+
+    .btn-icon {
+      font-size: 1rem;
+    }
+
+    /* MAIN LAYOUT: left QR | middle schedule | right QR */
+    .layout-main {
+      display: flex;
+      gap: 24px;
+      align-items: flex-start;
+    }
+
+    .qr-column {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      width: 220px;
+      flex-shrink: 0;
+    }
+
+    .qr-card {
+      background: rgba(15, 23, 42, 0.95);
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(148, 163, 184, 0.35);
+      padding: 10px 10px 12px;
+      box-shadow: 0 16px 35px rgba(15, 23, 42, 0.75);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .qr-card img {
+      width: 100%;
+      border-radius: 0.75rem;
+      background: #f9fafb;
+    }
+
+    .qr-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
+    }
+
+    .qr-label-main {
+      font-weight: 600;
+      font-size: 0.86rem;
+      text-align: center;
+    }
+
+    .qr-label-sub {
+      font-size: 0.8rem;
+      color: var(--text-soft);
+      text-align: center;
+    }
+
+    .schedule-wrapper {
+      flex: 1;
+      min-width: 0;
+    }
+
+    /* Controls */
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      justify-content: flex-end;
+      margin-bottom: 16px;
+      padding: 6px 2px;
+    }
+
+    .filters {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .select {
+      position: relative;
+      min-width: 150px;
+    }
+
+    .select select {
+      width: 100%;
+      border-radius: 999px;
+      padding: 7px 32px 7px 12px;
+      border: 1px solid var(--border-soft);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      outline: none;
+      -webkit-appearance: none;
+      appearance: none;
+      cursor: pointer;
+    }
+
+    .select::after {
+      content: "▾";
+      position: absolute;
+      right: 10px;
+      top: 50%;
+      transform: translateY(-52%);
+      font-size: 0.7rem;
+      color: var(--text-soft);
+      pointer-events: none;
+    }
+
+    .search-input {
+      position: relative;
+      min-width: 180px;
+      max-width: 230px;
+    }
+
+    .search-input input {
+      width: 100%;
+      border-radius: 999px;
+      padding: 7px 12px 7px 30px;
+      border: 1px solid var(--border-soft);
+      background: rgba(15, 23, 42, 0.95);
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      outline: none;
+    }
+
+    .search-input span {
+      position: absolute;
+      left: 9px;
+      top: 50%;
+      transform: translateY(-52%);
+      font-size: 0.8rem;
+      color: var(--text-soft);
+    }
+
+    /* Schedule */
+    .schedule {
+      background: rgba(15, 23, 42, 0.9);
+      border-radius: var(--radius-xl);
+      border: 1px solid var(--border-soft);
+      padding: 18px 16px 18px;
+      box-shadow: var(--shadow-soft);
+      backdrop-filter: blur(26px);
+    }
+
+    .schedule-header {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 12px;
+    }
+
+    .schedule-header-main h2 {
+      font-size: 1rem;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: #d1d5db;
+      font-weight: 600;
+    }
+
+    .schedule-header-main p {
+      margin-top: 2px;
+      font-size: 0.82rem;
+      color: var(--text-soft);
+    }
+
+    .schedule-legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 0.72rem;
+      color: var(--text-soft);
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(15, 23, 42, 0.95);
+      border: 1px solid rgba(148, 163, 184, 0.4);
+    }
+
+    .legend-badge {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+    }
+
+    .legend-badge--plenary { background: #f97316; }
+    .legend-badge--committee { background: #22c55e; }
+    .legend-badge--sideevent { background: #38bdf8; }
+
+    .schedule-grid {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(0, 2.4fr) minmax(0, 1.5fr);
+      font-size: 0.8rem;
+      border-radius: var(--radius-lg);
+      border: 1px solid rgba(51, 65, 85, 0.9);
+      overflow: hidden;
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 1), rgba(15, 23, 42, 0.98));
+    }
+
+    .schedule-row {
+      display: contents;
+    }
+
+    .schedule-cell {
+      padding: 10px 12px;
+      border-top: 1px solid rgba(31, 41, 55, 0.9);
+      border-right: 1px solid rgba(31, 41, 55, 0.9);
+      background: radial-gradient(circle at top left, rgba(15, 23, 42, 0.95), rgba(15, 23, 42, 1));
+    }
+
+    .schedule-row:first-child .schedule-cell {
+      border-top: none;
+    }
+
+    .schedule-cell:last-child {
+      border-right: none;
+    }
+
+    .schedule-cell--head {
+      font-size: 0.74rem;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-soft);
+      background: rgba(17, 24, 39, 0.98);
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 1;
+    }
+
+    .slot-time {
+      font-weight: 600;
+      color: #e5e7eb;
+      white-space: nowrap;
+    }
+
+    .slot-type {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 8px;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .slot-type--plenary {
+      background: rgba(248, 250, 252, 0.02);
+      border: 1px solid rgba(249, 115, 22, 0.6);
+      color: #fed7aa;
+    }
+
+    .slot-type--committee {
+      background: rgba(22, 163, 74, 0.07);
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      color: #bbf7d0;
+    }
+
+    .slot-type--sideevent {
+      background: rgba(56, 189, 248, 0.09);
+      border: 1px solid rgba(56, 189, 248, 0.65);
+      color: #bae6fd;
+    }
+
+    .slot-title {
+      font-weight: 600;
+      font-size: 0.82rem;
+      margin-bottom: 4px;
+    }
+
+    .slot-meta {
+      font-size: 0.76rem;
+      color: var(--text-soft);
+    }
+
+    .slot-meta span + span::before {
+      content: "•";
+      opacity: 0.55;
+      margin-inline: 6px;
+    }
+
+    .slot-room {
+      font-weight: 500;
+      color: #d1fae5;
+    }
+
+    .badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+    }
+
+    .empty-state {
+      padding: 20px;
+      text-align: center;
+      color: var(--text-soft);
+      font-size: 0.82rem;
+    }
+
+    .footer {
+      margin-top: 14px;
+      font-size: 0.72rem;
+      color: var(--text-soft);
+      display: flex;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      opacity: 0.85;
+    }
+
+    .footer a {
+      color: var(--accent);
+      text-decoration: none;
+    }
+
+    .footer a:hover {
+      text-decoration: underline;
+    }
+
+    /* CURRENT / NEXT HIGHLIGHT */
+    .slot-row--current .schedule-cell {
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.25), rgba(15, 23, 42, 1));
+      border-top-color: rgba(34, 197, 94, 0.7);
+    }
+
+    .slot-row--next .schedule-cell {
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 1));
+      border-top-color: rgba(56, 189, 248, 0.7);
+    }
+
+    .slot-row--current .slot-time,
+    .slot-row--current .slot-title {
+      color: #ecfccb;
+    }
+
+    .slot-row--next .slot-time,
+    .slot-row--next .slot-title {
+      color: #e0f2fe;
+    }
+
+    .slot-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+
+    .slot-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .slot-status--current {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.7);
+      color: #bbf7d0;
+    }
+
+    .slot-status--next {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      color: #bae6fd;
+    }
+
+    @media (max-width: 900px) {
+      body {
+        padding: 12px;
+      }
+
+      .header {
+        padding: 18px 16px 14px;
+      }
+
+      .header-inner {
+        align-items: flex-start;
+      }
+
+      .layout-main {
+        flex-direction: column;
+      }
+
+      .qr-column {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .qr-card {
+        width: 220px;
+      }
+
+      .schedule-grid {
+        display: block;
+      }
+
+      .schedule-row,
+      .schedule-cell {
+        display: block;
+      }
+
+      .schedule-cell--head {
+        position: static;
+        border-top: none;
+        border-right: none;
+      }
+
+      .schedule-cell + .schedule-cell {
+        border-top: 1px solid rgba(31, 41, 55, 0.9);
+      }
+
+      .schedule-cell {
+        border-right: none;
+      }
+
+      .slot-title {
+        font-size: 0.84rem;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .filters {
+        width: 100%;
+      }
+
+      .search-input,
+      .select {
+        flex: 1;
+        max-width: 100%;
+      }
+
+      .header-actions {
+        width: 100%;
+        justify-content: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="header-main">
+          <div class="logo-image">
+            <img src="UZ_CoP20_logo_FINAL_0.jpg" alt="CITES 50 Logo">
+          </div>
+          <div class="header-text">
+            <h1>CITES CoP<span>20</span></h1>
+            <div class="header-subtitle">
+              Conference of the Parties &mdash; Programme & Schedule
+            </div>
+            <div class="meta-row">
+              <div class="meta-chip">
+                <span class="meta-dot"></span>
+                <!--<span>Side events — SL1</span>-->
+              </div>
+              <div class="meta-chip">
+                <span>Location: Samarkand, Uzbekistan</span>
+              </div>
+              <div class="meta-chip">
+                <span>Today: Saturday, 29 November 2025</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+        <!--  <button class="btn-primary" type="button">
+            <span class="btn-icon">⬇</span>
+            Export PDF (placeholder)
+          </button> -->
+          <button class="btn-ghost" type="button" id="todayBtn">
+            <span class="btn-icon">📅</span>
+            Today’s programme
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- MAIN LAYOUT: QR left + schedule center + QR right -->
+    <div class="layout-main">
+
+      <!-- LEFT QR COLUMN -->
+      <aside class="qr-column">
+        <div class="qr-card">
+          <img src="CITES_EVENTS_qrcode_play.google.com.png" alt="CITES Events App – Android QR">
+          <div class="qr-dot"></div>
+          <div class="qr-label-main">CITES Events App</div>
+          <div class="qr-label-sub">Android</div>
+        </div>
+
+        <div class="qr-card">
+          <img src="qrcode_cites_events_ios_apple.png" alt="CITES Events App – Apple QR">
+          <div class="qr-dot"></div>
+          <div class="qr-label-main">CITES Events App</div>
+          <div class="qr-label-sub">Apple</div>
+        </div>
+      </aside>
+
+      <!-- CENTER: CONTROLS + SCHEDULE -->
+      <div class="schedule-wrapper">
+        <!-- CONTROLS -->
+        <section class="controls" aria-label="Schedule filters">
+          <div class="filters">
+            <div class="select">
+              <select id="trackFilter" aria-label="Filter by session type">
+                <option value="all">All types</option>
+                <option value="plenary">Plenary</option>
+                <option value="committee">Committees / WGs</option>
+                <option value="sideevent">Side events / Other</option>
+              </select>
+            </div>
+            <div class="search-input">
+              <span>🔍</span>
+              <input id="searchInput" type="text" placeholder="Search agenda…" />
+            </div>
+          </div>
+        </section>
+
+        <!-- SCHEDULE -->
+        <main class="schedule" aria-label="CITES programme">
+          <div class="schedule-header">
+            <div class="schedule-header-main">
+              <h2 id="scheduleTitle">Today — Side events (SL1)</h2>
+              <p id="scheduleSubtitle">Saturday, 29 November 2025</p>
+            </div>
+            <div class="schedule-legend" aria-hidden="true">
+              <div class="legend-item">
+                <span class="legend-badge legend-badge--plenary"></span> Plenary
+              </div>
+              <div class="legend-item">
+                <span class="legend-badge legend-badge--committee"></span> Committee / WG
+              </div>
+              <div class="legend-item">
+                <span class="legend-badge legend-badge--sideevent"></span> Side event
+              </div>
+            </div>
+          </div>
+
+          <div id="scheduleGridContainer"></div>
+          <div class="empty-state" id="emptyState" style="display:none;">
+            No sessions match your filters. Try changing the type or search text.
+          </div>
+        </main>
+      </div>
+
+      <!-- RIGHT QR COLUMN -->
+      <aside class="qr-column">
+        <div class="qr-card">
+          <img src="cop20-participants-wifi.png" alt="Participants WiFi QR">
+          <div class="qr-label-main">Participants Wi-Fi</div>
+          <div class="qr-label-sub">Scan to connect</div>
+        </div>
+      </aside>
+
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+      <span>Draft example &mdash; replace with official CITES / Secretariat footer text.</span>
+      <span>Contact: <a href="mailto:secretariat@example.org">secretariat@example.org</a></span>
+    </footer>
+  </div>
+
+  <script>
+    // All SL1 items for 29 Nov 2025
+    const scheduleToday = [
+      {
+        time: "07:00–09:00",
+        type: "committee",
+        title: "Daily Coordination Meeting - North America Region",
+        chair: "North America Region",
+        room: "Markhor S. (70)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "07:00–09:00",
+        type: "committee",
+        title: "Daily Coordination Meeting - Oceania",
+        chair: "Oceania Region",
+        room: "D. Monitor (32)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "07:00–09:00",
+        type: "committee",
+        title: "Daily Coordination Meeting - Africa Region copy",
+        chair: "Africa Region",
+        room: "S.Falcon (70)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "07:00–09:00",
+        type: "committee",
+        title: "Daily Coordination Meeting - Central and South America and the Caribbean",
+        chair: "CSAC Region",
+        room: "Saiga A. (120)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "07:00–09:00",
+        type: "committee",
+        title: "Daily Coordination Meeting - Arab Region",
+        chair: "CSAC Region",
+        room: "Bukahra D. (120)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "08:30–09:00",
+        type: "committee",
+        title: "Regional Meeting - Europe",
+        chair: "Regional Meeting - Europe",
+        room: "B.Stork (70)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "08:30–09:00",
+        type: "sideevent",
+        title: "Drafting Group - Great Apes (CoP20 Doc. 78.2)",
+        chair: "Drafting Group",
+        room: "G.Bustard (40)",
+        notes: "Other"
+      },
+      {
+        time: "09:00–12:00",
+        type: "plenary",
+        title: "Committee I",
+        chair: "",
+        room: "Argali (Com I)",
+        notes: "Main mtg"
+      },
+      {
+        time: "09:00–12:00",
+        type: "plenary",
+        title: "Committee II",
+        chair: "",
+        room: "Rhodiola S. (Com II)",
+        notes: "Main mtg"
+      },
+      {
+        time: "12:00–14:00",
+        type: "committee",
+        title: "Finance and Budget Working Group",
+        chair: "Finance and Budget Working Group",
+        room: "S. Leopard (32)",
+        notes: "WG"
+      },
+      {
+        time: "12:15–13:45",
+        type: "sideevent",
+        title: "Illegal Sloth Trade LA",
+        chair: "Costa Rica- Brazil – Panama - Peru with support of Special … AW (Event is co-hosted)",
+        room: "S.Falcon (70)",
+        notes: "Side event"
+      },
+      {
+        time: "12:15–13:45",
+        type: "sideevent",
+        title: "A Decade of Demand Reduction",
+        chair: "TRAFFIC - co-hosted with the German government through BMUKN",
+        room: "Markhor S. (70)",
+        notes: "Side event"
+      },
+      {
+        time: "12:15–13:45",
+        type: "sideevent",
+        title: "Wild Animals Not Pets - Ensuring Responsible Pet Ownership Through Positive Lists in Consumer Markets",
+        chair: "Animal Advocacy and Protection (AAP); co-host Eurogroup for Animals (EfA)",
+        room: "C.A.Tortoise (40)",
+        notes: "Side event"
+      },
+      {
+        time: "12:15–13:45",
+        type: "sideevent",
+        title: "CITES' effectiveness",
+        chair: "IUCN Sustainable Use and Livelihoods Specialist Group",
+        room: "Bukahra D. (120)",
+        notes: "Side event"
+      },
+      {
+        time: "12:15–13.45",
+        type: "sideevent",
+        title: "Drafting Group - Paubrasilia echinata (Agenda Item 97 & Prop 46)",
+        chair: "Drafting Group",
+        room: "Manul (40)",
+        notes: "Other"
+      },
+      {
+        time: "13:00–14:00",
+        type: "sideevent",
+        title: "Midway Press Conference",
+        chair: "CITES Secretariat and Uzbekistan",
+        room: "Caracal (Press)",
+        notes: "Other"
+      },
+      {
+        time: "14:00–17:00",
+        type: "plenary",
+        title: "Committee II",
+        chair: "",
+        room: "Rhodiola S. (Com II)",
+        notes: "Main mtg"
+      },
+      {
+        time: "14:00–17:00",
+        type: "plenary",
+        title: "Committee I",
+        chair: "",
+        room: "Argali (Com I)",
+        notes: "Main mtg"
+      },
+      {
+        time: "17:00–17:30",
+        type: "sideevent",
+        title: "Bureau Meeting",
+        chair: "CoP20 Bureau",
+        room: "L. Orchid",
+        notes: "Other"
+      },
+      {
+        time: "17:00–18:00",
+        type: "sideevent",
+        title: "Meeting - United States Delegation - NGO Briefings",
+        chair: "Meeting - United States Delegation - NGO Briefings",
+        room: "G.Bustard (40)",
+        notes: "Other"
+      },
+      {
+        time: "17:00–18:30",
+        type: "committee",
+        title: "Working Group - ETIS Categorization of Parties (Agenda Item 43)",
+        chair: "Working Group - Chair/Singapore",
+        room: "B.Stork (70)",
+        notes: "WG"
+      },
+      {
+        time: "17:15–18:45",
+        type: "sideevent",
+        title: "CMS, CITES and Sharks",
+        chair: "Convention on the Conservation of Migratory Species (with support of the Sharks MOU Advisory Committee)",
+        room: "S.Falcon (70)",
+        notes: "Side event"
+      },
+      {
+        time: "17:15–18:45",
+        type: "sideevent",
+        title: "CITES and Local Voices",
+        chair: "BirdLife International, in collaboration with the governments of … , and Mandai Nature",
+        room: "C.A.Tortoise (40)",
+        notes: "Side event"
+      },
+      {
+        time: "17:15–18:45",
+        type: "sideevent",
+        title: "Fish Maw Trade Impacts",
+        chair: "Animal Welfare Institute. Co-hosts: BLOOM HK, Center for … Conservation Society.",
+        room: "Markhor S. (70)",
+        notes: "Side event"
+      },
+      {
+        time: "17:15–18:45",
+        type: "sideevent",
+        title: "Wildlife Economy",
+        chair: "The international Council for Game and Wildlife Conservation (CIC) in cooperation with the Wildlife Conservation Trust - India and the African Community of Practice / Sustainable use Programs of the IUCN Commission on Ecosystem Management and the IUCN World Commissions on Environmental Law, and Global Hunting for Sustainable Unity – an alliance of national hunting organizations Network",
+        room: "Bukahra D. (120)",
+        notes: "Side event"
+      },
+      {
+        time: "17:15–18:45",
+        type: "committee",
+        title: "Working Group on Paubrasilia echinata (Agenda Item 97 & Prop 46)",
+        chair: "Working Group - Chair/Canada",
+        room: "Eulophia D. (70)",
+        notes: "WG"
+      },
+      {
+        time: "18:15–19:00",
+        type: "sideevent",
+        title: "CGYN",
+        chair: "CITES Secretariat",
+        room: "S. Leopard (32)",
+        notes: "Other"
+      },
+      {
+        time: "18:15–19.30",
+        type: "sideevent",
+        title: "CITES Secretariat Meeting",
+        chair: "CITES Secretariat Meeting",
+        room: "Caracal (Press)",
+        notes: "Other"
+      },
+      {
+        time: "19:00–20:30",
+        type: "sideevent",
+        title: "Enforcement in action",
+        chair: "Wildlife Justice Commission. Event co-hosted by Nigeria.",
+        room: "Markhor S. (70)",
+        notes: "Side event"
+      },
+      {
+        time: "19:00–20:30",
+        type: "sideevent",
+        title: "Progress in and tools for implementing CITES for seahorses.",
+        chair: "IUCN (International Union for Conservation of Nature) - Seahorse, Pipefish & Seadragon Specialist Group",
+        room: "Bukahra D. (120)",
+        notes: "Side event"
+      },
+      {
+        time: "19:00–20:30",
+        type: "sideevent",
+        title: "Civil Society sharing wildlife crime information with law enforcement",
+        chair: "United for Wildlife, the Nature Crime Alliance and INTERPOL",
+        room: "Saiga A. (120)",
+        notes: "Side event"
+      }
+    ];
+
+    const scheduleGridContainer = document.getElementById("scheduleGridContainer");
+    const emptyState = document.getElementById("emptyState");
+    const trackFilter = document.getElementById("trackFilter");
+    const searchInput = document.getElementById("searchInput");
+    const todayBtn = document.getElementById("todayBtn");
+
+    // ===== TIME PARSING & FLAGS (current / next) =====
+    function parseTimeRange(range) {
+      if (!range) {
+        return { start: 0, end: 24 * 60 };
+      }
+      const parts = range.split("–");
+      if (parts.length !== 2) {
+        return { start: 0, end: 24 * 60 };
+      }
+
+      function parsePart(p) {
+        p = p.trim().replace(".", ":");
+        const segments = p.split(":");
+        const h = parseInt(segments[0], 10) || 0;
+        const m = parseInt(segments[1], 10) || 0;
+        return h * 60 + m;
+      }
+
+      const start = parsePart(parts[0]);
+      let end = parsePart(parts[1]);
+
+      // Avoid zero-length or negative intervals
+      if (!Number.isFinite(end) || end <= start) {
+        end = start + 30; // default 30 minutes
+      }
+      return { start, end };
+    }
+
+    function getNowMinutes() {
+      const now = new Date();
+      return now.getHours() * 60 + now.getMinutes();
+    }
+
+    // Precompute times
+    scheduleToday.forEach(slot => {
+      const { start, end } = parseTimeRange(slot.time);
+      slot.startMinutes = start;
+      slot.endMinutes = end;
+    });
+
+    // ===== FILTER + TIME-BASED VIEW (hide past) =====
+    function getFilteredSlots() {
+      const searchText = (searchInput.value || "").toLowerCase().trim();
+      const track = trackFilter.value;
+      const nowMinutes = getNowMinutes();
+
+      let slots = scheduleToday.filter(slot => {
+        // Hide past items: end time before "now"
+        const isFutureOrCurrent = slot.endMinutes >= nowMinutes;
+
+        const matchesTrack = track === "all" || slot.type === track;
+
+        const matchesText =
+          !searchText ||
+          (slot.title && slot.title.toLowerCase().includes(searchText)) ||
+          (slot.notes && slot.notes.toLowerCase().includes(searchText)) ||
+          (slot.room && slot.room.toLowerCase().includes(searchText)) ||
+          (slot.chair && slot.chair.toLowerCase().includes(searchText));
+
+        return isFutureOrCurrent && matchesTrack && matchesText;
+      });
+
+      // Sort by start time
+      slots.sort((a, b) => a.startMinutes - b.startMinutes);
+
+      // Reset flags
+      slots.forEach(s => {
+        s._isCurrent = false;
+        s._isNext = false;
+      });
+
+      // Mark current and next
+      const now = nowMinutes;
+      let currentIdx = -1;
+      let nextIdx = -1;
+
+      for (let i = 0; i < slots.length; i++) {
+        const s = slots[i];
+        if (s.startMinutes <= now && now < s.endMinutes) {
+          currentIdx = i;
+          break;
+        }
+      }
+      if (currentIdx === -1) {
+        for (let i = 0; i < slots.length; i++) {
+          if (slots[i].startMinutes > now) {
+            nextIdx = i;
+            break;
+          }
+        }
+      } else {
+        for (let i = currentIdx + 1; i < slots.length; i++) {
+          if (slots[i].startMinutes >= now) {
+            nextIdx = i;
+            break;
+          }
+        }
+      }
+
+      if (currentIdx !== -1) {
+        slots[currentIdx]._isCurrent = true;
+      }
+      if (nextIdx !== -1) {
+        slots[nextIdx]._isNext = true;
+      }
+
+      return { slots, currentIdx, nextIdx };
+    }
+
+    // ===== PAGING / SLIDES =====
+    let currentPage = 0;
+    const pageSize = 9; // max items per slide
+    let autoRotateId = null;
+    const autoRotateMs = 20000; // 20 seconds per slide
+
+    function renderSchedule(page = 0) {
+      const { slots } = getFilteredSlots();
+
+      if (!slots.length) {
+        scheduleGridContainer.innerHTML = "";
+        emptyState.style.display = "block";
+        return;
+      }
+
+      emptyState.style.display = "none";
+
+      const totalPages = Math.max(1, Math.ceil(slots.length / pageSize));
+      if (page >= totalPages) {
+        page = 0;
+      }
+      currentPage = page;
+
+      const startIndex = page * pageSize;
+      const pageSlots = slots.slice(startIndex, startIndex + pageSize);
+
+      const grid = document.createElement("div");
+      grid.className = "schedule-grid";
+
+      const headerRow = document.createElement("div");
+      headerRow.className = "schedule-row";
+      headerRow.innerHTML = `
+        <div class="schedule-cell schedule-cell--head">Time</div>
+        <div class="schedule-cell schedule-cell--head">Session</div>
+        <div class="schedule-cell schedule-cell--head">Room / Notes</div>
+      `;
+      grid.appendChild(headerRow);
+
+      pageSlots.forEach(slot => {
+        const row = document.createElement("div");
+        row.className = "schedule-row";
+
+        if (slot._isCurrent) {
+          row.classList.add("slot-row--current");
+        } else if (slot._isNext) {
+          row.classList.add("slot-row--next");
+        }
+
+        const timeCell = document.createElement("div");
+        timeCell.className = "schedule-cell";
+        timeCell.innerHTML = `<div class="slot-time">${slot.time || ""}</div>`;
+
+        const sessionCell = document.createElement("div");
+        sessionCell.className = "schedule-cell";
+
+        const typeClass =
+          slot.type === "plenary"
+            ? "slot-type--plenary"
+            : slot.type === "committee"
+            ? "slot-type--committee"
+            : "slot-type--sideevent";
+
+        const typeLabel =
+          slot.type === "plenary"
+            ? "Plenary"
+            : slot.type === "committee"
+            ? "Committee / WG"
+            : "Side event";
+
+        const chairText =
+          slot.chair && slot.chair.trim().length
+            ? slot.chair
+            : "Chair / organizer TBC";
+
+        const statusPill = slot._isCurrent
+          ? `<span class="slot-status slot-status--current"><span class="slot-status-dot"></span>Now</span>`
+          : slot._isNext
+          ? `<span class="slot-status slot-status--next"><span class="slot-status-dot"></span>Next</span>`
+          : "";
+
+        sessionCell.innerHTML = `
+          <div class="slot-type ${typeClass}">
+            <span class="badge-dot"></span>
+            <span>${typeLabel}</span>
+          </div>
+          <div class="slot-title">
+            ${slot.title || ""} ${statusPill}
+          </div>
+          <div class="slot-meta">
+            <span>${chairText}</span>
+          </div>
+        `;
+
+        const roomCell = document.createElement("div");
+        roomCell.className = "schedule-cell";
+        roomCell.innerHTML = `
+          <div class="slot-room">${slot.room || "Room TBC"}</div>
+          ${slot.notes ? `<div class="slot-meta">${slot.notes}</div>` : ""}
+        `;
+
+        row.appendChild(timeCell);
+        row.appendChild(sessionCell);
+        row.appendChild(roomCell);
+        grid.appendChild(row);
+      });
+
+      scheduleGridContainer.innerHTML = "";
+      scheduleGridContainer.appendChild(grid);
+    }
+
+    function resetAutoRotate() {
+      if (autoRotateId) {
+        clearInterval(autoRotateId);
+      }
+      autoRotateId = setInterval(() => {
+        const { slots } = getFilteredSlots();
+        if (!slots.length) return;
+
+        const totalPages = Math.max(1, Math.ceil(slots.length / pageSize));
+        currentPage = (currentPage + 1) % totalPages;
+        renderSchedule(currentPage);
+      }, autoRotateMs);
+    }
+
+    // EVENTS
+    trackFilter.addEventListener("change", () => {
+      currentPage = 0;
+      renderSchedule(currentPage);
+      resetAutoRotate();
+    });
+
+    searchInput.addEventListener("input", () => {
+      currentPage = 0;
+      renderSchedule(currentPage);
+      resetAutoRotate();
+    });
+
+    todayBtn.addEventListener("click", () => {
+      // Reset filters to full "today" view
+      trackFilter.value = "all";
+      searchInput.value = "";
+      currentPage = 0;
+      renderSchedule(currentPage);
+      resetAutoRotate();
+    });
+
+    // INITIAL RENDER
+    renderSchedule(0);
+    resetAutoRotate();
+  </script>
+</body>
+</html>
+
+
+
+
+
+
