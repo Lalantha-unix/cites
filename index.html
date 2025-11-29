@@ -213,27 +213,19 @@
       font-size: 1rem;
     }
 
-    /* QR STRIP */
-    .qr-strip {
+    /* MAIN LAYOUT: left QR | middle schedule | right QR */
+    .layout-main {
       display: flex;
-      justify-content: space-between;
       gap: 24px;
-      margin-bottom: 18px;
+      align-items: flex-start;
     }
 
     .qr-column {
       display: flex;
       flex-direction: column;
       gap: 16px;
-    }
-
-    .qr-column-left {
-      max-width: 220px;
-    }
-
-    .qr-column-right {
-      max-width: 220px;
-      margin-left: auto;
+      width: 220px;
+      flex-shrink: 0;
     }
 
     .qr-card {
@@ -272,6 +264,11 @@
       font-size: 0.8rem;
       color: var(--text-soft);
       text-align: center;
+    }
+
+    .schedule-wrapper {
+      flex: 1;
+      min-width: 0;
     }
 
     /* Controls */
@@ -556,13 +553,19 @@
         align-items: flex-start;
       }
 
-      .qr-strip {
+      .layout-main {
         flex-direction: column;
-        align-items: flex-start;
       }
 
-      .qr-column-right {
-        margin-left: 0;
+      .qr-column {
+        width: 100%;
+        flex-direction: row;
+        justify-content: flex-start;
+        flex-wrap: wrap;
+      }
+
+      .qr-card {
+        width: 220px;
       }
 
       .schedule-grid {
@@ -624,7 +627,6 @@
       <div class="header-inner">
         <div class="header-main">
           <div class="logo-image">
-            <!-- logo file in same folder -->
             <img src="cites_logo.jpg" alt="CITES 50 Logo">
           </div>
           <div class="header-text">
@@ -660,11 +662,11 @@
       </div>
     </header>
 
-    <!-- QR STRIP -->
-    <section class="qr-strip" aria-label="CITES app and Wi-Fi QR codes">
-      <div class="qr-column qr-column-left">
+    <!-- MAIN LAYOUT: QR left + schedule center + QR right -->
+    <div class="layout-main">
 
-        <!-- CITES App Android -->
+      <!-- LEFT QR COLUMN -->
+      <aside class="qr-column">
         <div class="qr-card">
           <img src="CITES_EVENTS_qrcode_play.google.com.png" alt="CITES Events App – Android QR">
           <div class="qr-dot"></div>
@@ -672,70 +674,70 @@
           <div class="qr-label-sub">Android</div>
         </div>
 
-        <!-- CoP20 banner / poster -->
         <div class="qr-card">
           <img src="CoP20_dweb_UZ_eng.jpg" alt="CITES CoP20 Poster">
           <div class="qr-label-main">CITES CoP20</div>
           <div class="qr-label-sub">Samarkand 2025</div>
         </div>
+      </aside>
 
+      <!-- CENTER: CONTROLS + SCHEDULE -->
+      <div class="schedule-wrapper">
+        <!-- CONTROLS -->
+        <section class="controls" aria-label="Schedule filters">
+          <div class="filters">
+            <div class="select">
+              <select id="trackFilter" aria-label="Filter by session type">
+                <option value="all">All types</option>
+                <option value="plenary">Plenary</option>
+                <option value="committee">Committees / WGs</option>
+                <option value="sideevent">Side events / Other</option>
+              </select>
+            </div>
+            <div class="search-input">
+              <span>🔍</span>
+              <input id="searchInput" type="text" placeholder="Search agenda…" />
+            </div>
+          </div>
+        </section>
+
+        <!-- SCHEDULE -->
+        <main class="schedule" aria-label="CITES programme">
+          <div class="schedule-header">
+            <div class="schedule-header-main">
+              <h2 id="scheduleTitle">Today — Side events (SL1)</h2>
+              <p id="scheduleSubtitle">Saturday, 29 November 2025</p>
+            </div>
+            <div class="schedule-legend" aria-hidden="true">
+              <div class="legend-item">
+                <span class="legend-badge legend-badge--plenary"></span> Plenary
+              </div>
+              <div class="legend-item">
+                <span class="legend-badge legend-badge--committee"></span> Committee / WG
+              </div>
+              <div class="legend-item">
+                <span class="legend-badge legend-badge--sideevent"></span> Side event
+              </div>
+            </div>
+          </div>
+
+          <div id="scheduleGridContainer"></div>
+          <div class="empty-state" id="emptyState" style="display:none;">
+            No sessions match your filters. Try changing the type or search text.
+          </div>
+        </main>
       </div>
 
-      <div class="qr-column qr-column-right">
-
-        <!-- Participants WiFi QR -->
+      <!-- RIGHT QR COLUMN -->
+      <aside class="qr-column">
         <div class="qr-card">
           <img src="cop20-participants-wifi.png" alt="Participants WiFi QR">
           <div class="qr-label-main">Participants Wi-Fi</div>
           <div class="qr-label-sub">Scan to connect</div>
         </div>
+      </aside>
 
-      </div>
-    </section>
-
-    <!-- CONTROLS -->
-    <section class="controls" aria-label="Schedule filters">
-      <div class="filters">
-        <div class="select">
-          <select id="trackFilter" aria-label="Filter by session type">
-            <option value="all">All types</option>
-            <option value="plenary">Plenary</option>
-            <option value="committee">Committees / WGs</option>
-            <option value="sideevent">Side events / Other</option>
-          </select>
-        </div>
-        <div class="search-input">
-          <span>🔍</span>
-          <input id="searchInput" type="text" placeholder="Search agenda…" />
-        </div>
-      </div>
-    </section>
-
-    <!-- SCHEDULE -->
-    <main class="schedule" aria-label="CITES programme">
-      <div class="schedule-header">
-        <div class="schedule-header-main">
-          <h2 id="scheduleTitle">Today — Side events (SL1)</h2>
-          <p id="scheduleSubtitle">Saturday, 29 November 2025</p>
-        </div>
-        <div class="schedule-legend" aria-hidden="true">
-          <div class="legend-item">
-            <span class="legend-badge legend-badge--plenary"></span> Plenary
-          </div>
-          <div class="legend-item">
-            <span class="legend-badge legend-badge--committee"></span> Committee / WG
-          </div>
-          <div class="legend-item">
-            <span class="legend-badge legend-badge--sideevent"></span> Side event
-          </div>
-        </div>
-      </div>
-
-      <div id="scheduleGridContainer"></div>
-      <div class="empty-state" id="emptyState" style="display:none;">
-        No sessions match your filters. Try changing the type or search text.
-      </div>
-    </main>
+    </div>
 
     <!-- FOOTER -->
     <footer class="footer">
@@ -1094,12 +1096,10 @@
       scheduleGridContainer.appendChild(grid);
     }
 
-    // Events
     trackFilter.addEventListener("change", renderSchedule);
     searchInput.addEventListener("input", renderSchedule);
     todayBtn.addEventListener("click", renderSchedule);
 
-    // Initial render
     renderSchedule();
   </script>
 </body>
