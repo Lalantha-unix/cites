@@ -215,37 +215,9 @@
       flex-wrap: wrap;
       gap: 12px;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       margin-bottom: 16px;
       padding: 6px 2px;
-    }
-
-    .tabs {
-      display: inline-flex;
-      padding: 2px;
-      border-radius: 999px;
-      background: rgba(15, 23, 42, 0.9);
-      border: 1px solid var(--border-soft);
-      backdrop-filter: blur(18px);
-      gap: 3px;
-    }
-
-    .tab {
-      border-radius: 999px;
-      padding: 5px 12px;
-      border: none;
-      background: transparent;
-      color: var(--text-soft);
-      font-size: 0.78rem;
-      cursor: pointer;
-      transition: background var(--transition-fast), color var(--transition-fast), transform var(--transition-fast);
-      white-space: nowrap;
-    }
-
-    .tab.is-active {
-      background: var(--accent-soft);
-      color: var(--accent);
-      transform: translateY(-1px);
     }
 
     .filters {
@@ -472,19 +444,6 @@
       color: #d1fae5;
     }
 
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 2px 7px;
-      border-radius: 999px;
-      border: 1px dashed rgba(148, 163, 184, 0.7);
-      font-size: 0.68rem;
-      text-transform: uppercase;
-      letter-spacing: 0.12em;
-      color: var(--text-soft);
-    }
-
     .badge-dot {
       width: 6px;
       height: 6px;
@@ -492,7 +451,6 @@
       background: var(--accent);
     }
 
-    /* Empty state */
     .empty-state {
       padding: 20px;
       text-align: center;
@@ -500,7 +458,6 @@
       font-size: 0.82rem;
     }
 
-    /* Footer */
     .footer {
       margin-top: 14px;
       font-size: 0.72rem;
@@ -592,26 +549,25 @@
     <header class="header">
       <div class="header-inner">
         <div class="header-main">
-          <div class="logo-circle">
-            CITES
-          </div>
+          <div class="logo-image">
+  <img src="cites_logo.jpg" alt="CITES 50 Logo">
+</div>
+
           <div class="header-text">
-            <h1>
-              CITES CoP<span>20</span>
-            </h1>
+            <h1>CITES CoP<span>20</span></h1>
             <div class="header-subtitle">
               Conference of the Parties &mdash; Programme & Schedule
             </div>
             <div class="meta-row">
               <div class="meta-chip">
                 <span class="meta-dot"></span>
-                <span>Draft schedule &mdash; for internal use</span>
+                <span>Side events — SL1</span>
               </div>
               <div class="meta-chip">
                 <span>Location: Samarkand, Uzbekistan</span>
               </div>
               <div class="meta-chip">
-                <span>Dates: 24 Nov &ndash; 5 Dec 2025</span>
+                <span>Today: Saturday, 29 November 2025</span>
               </div>
             </div>
           </div>
@@ -626,29 +582,19 @@
             <span class="btn-icon">📅</span>
             Today’s programme
           </button>
-          <button class="btn-ghost" type="button" id="tomorrowBtn">
-            <span class="btn-icon">⏭</span>
-            Tomorrow’s programme
-          </button>
         </div>
       </div>
     </header>
 
     <!-- CONTROLS -->
     <section class="controls" aria-label="Schedule filters">
-      <div class="tabs" id="dayTabs">
-        <button class="tab is-active" data-day="day1">Day 1</button>
-        <button class="tab" data-day="day2">Day 2</button>
-        <button class="tab" data-day="day3">Day 3</button>
-      </div>
-
       <div class="filters">
         <div class="select">
           <select id="trackFilter" aria-label="Filter by session type">
             <option value="all">All types</option>
             <option value="plenary">Plenary</option>
-            <option value="committee">Committee</option>
-            <option value="sideevent">Side events</option>
+            <option value="committee">Committees / WGs</option>
+            <option value="sideevent">Side events / Other</option>
           </select>
         </div>
         <div class="search-input">
@@ -659,31 +605,28 @@
     </section>
 
     <!-- SCHEDULE -->
-    <main class="schedule" id="schedule" aria-label="CITES programme">
+    <main class="schedule" aria-label="CITES programme">
       <div class="schedule-header">
         <div class="schedule-header-main">
-          <h2 id="scheduleTitle">Day 1 &mdash; Opening</h2>
-          <p id="scheduleSubtitle">Monday, 24 November 2025</p>
+          <h2 id="scheduleTitle">Today — Side events (SL1)</h2>
+          <p id="scheduleSubtitle">Saturday, 29 November 2025</p>
         </div>
         <div class="schedule-legend" aria-hidden="true">
           <div class="legend-item">
-            <span class="legend-badge legend-badge--plenary"></span>
-            Plenary
+            <span class="legend-badge legend-badge--plenary"></span> Plenary
           </div>
           <div class="legend-item">
-            <span class="legend-badge legend-badge--committee"></span>
-            Committee
+            <span class="legend-badge legend-badge--committee"></span> Committee / WG
           </div>
           <div class="legend-item">
-            <span class="legend-badge legend-badge--sideevent"></span>
-            Side event
+            <span class="legend-badge legend-badge--sideevent"></span> Side event
           </div>
         </div>
       </div>
 
       <div id="scheduleGridContainer"></div>
       <div class="empty-state" id="emptyState" style="display:none;">
-        No sessions match your filters. Try changing the day, type, or search text.
+        No sessions match your filters. Try changing the type or search text.
       </div>
     </main>
 
@@ -695,239 +638,282 @@
   </div>
 
   <script>
+    // All SL1 items for 29 Nov 2025
+    const scheduleToday = [
+      {
+        time: "07:00–09:00",
+        type: "committee",
+        title: "Daily Coordination Meeting - North America Region",
+        chair: "North America Region",
+        room: "Markhor S. (70)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "07:00–09:00",
+        type: "committee",
+        title: "Daily Coordination Meeting - Oceania",
+        chair: "Oceania Region",
+        room: "D. Monitor (32)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "07:00–09:00",
+        type: "committee",
+        title: "Daily Coordination Meeting - Africa Region copy",
+        chair: "Africa Region",
+        room: "S.Falcon (70)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "07:00–09:00",
+        type: "committee",
+        title: "Daily Coordination Meeting - Central and South America and the Caribbean",
+        chair: "CSAC Region",
+        room: "Saiga A. (120)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "07:00–09:00",
+        type: "committee",
+        title: "Daily Coordination Meeting - Arab Region",
+        chair: "CSAC Region",
+        room: "Bukahra D. (120)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "08:30–09:00",
+        type: "committee",
+        title: "Regional Meeting - Europe",
+        chair: "Regional Meeting - Europe",
+        room: "B.Stork (70)",
+        notes: "Regional mtg"
+      },
+      {
+        time: "08:30–09:00",
+        type: "sideevent",
+        title: "Drafting Group - Great Apes (CoP20 Doc. 78.2)",
+        chair: "Drafting Group",
+        room: "G.Bustard (40)",
+        notes: "Other"
+      },
+      {
+        time: "09:00–12:00",
+        type: "plenary",
+        title: "Committee I",
+        chair: "",
+        room: "Argali (Com I)",
+        notes: "Main mtg"
+      },
+      {
+        time: "09:00–12:00",
+        type: "plenary",
+        title: "Committee II",
+        chair: "",
+        room: "Rhodiola S. (Com II)",
+        notes: "Main mtg"
+      },
+      {
+        time: "12:00–14:00",
+        type: "committee",
+        title: "Finance and Budget Working Group",
+        chair: "Finance and Budget Working Group",
+        room: "S. Leopard (32)",
+        notes: "WG"
+      },
+      {
+        time: "12:15–13:45",
+        type: "sideevent",
+        title: "Illegal Sloth Trade LA",
+        chair: "Costa Rica- Brazil – Panama - Peru with support of Special … AW (Event is co-hosted)",
+        room: "S.Falcon (70)",
+        notes: "Side event"
+      },
+      {
+        time: "12:15–13:45",
+        type: "sideevent",
+        title: "A Decade of Demand Reduction",
+        chair: "TRAFFIC - co-hosted with the German government through BMUKN",
+        room: "Markhor S. (70)",
+        notes: "Side event"
+      },
+      {
+        time: "12:15–13:45",
+        type: "sideevent",
+        title: "Wild Animals Not Pets - Ensuring Responsible Pet Ownership Through Positive Lists in Consumer Markets",
+        chair: "Animal Advocacy and Protection (AAP); co-host Eurogroup for Animals (EfA)",
+        room: "C.A.Tortoise (40)",
+        notes: "Side event"
+      },
+      {
+        time: "12:15–13:45",
+        type: "sideevent",
+        title: "CITES' effectiveness",
+        chair: "IUCN Sustainable Use and Livelihoods Specialist Group",
+        room: "Bukahra D. (120)",
+        notes: "Side event"
+      },
+      {
+        time: "12:15–13.45",
+        type: "sideevent",
+        title: "Drafting Group - Paubrasilia echinata (Agenda Item 97 & Prop 46)",
+        chair: "Drafting Group",
+        room: "Manul (40)",
+        notes: "Other"
+      },
+      {
+        time: "13:00–14:00",
+        type: "sideevent",
+        title: "Midway Press Conference",
+        chair: "CITES Secretariat and Uzbekistan",
+        room: "Caracal (Press)",
+        notes: "Other"
+      },
+      {
+        time: "14:00–17:00",
+        type: "plenary",
+        title: "Committee II",
+        chair: "",
+        room: "Rhodiola S. (Com II)",
+        notes: "Main mtg"
+      },
+      {
+        time: "14:00–17:00",
+        type: "plenary",
+        title: "Committee I",
+        chair: "",
+        room: "Argali (Com I)",
+        notes: "Main mtg"
+      },
+      {
+        time: "17:00–17:30",
+        type: "sideevent",
+        title: "Bureau Meeting",
+        chair: "CoP20 Bureau",
+        room: "L. Orchid",
+        notes: "Other"
+      },
+      {
+        time: "17:00–18:00",
+        type: "sideevent",
+        title: "Meeting - United States Delegation - NGO Briefings",
+        chair: "Meeting - United States Delegation - NGO Briefings",
+        room: "G.Bustard (40)",
+        notes: "Other"
+      },
+      {
+        time: "17:00–18:30",
+        type: "committee",
+        title: "Working Group - ETIS Categorization of Parties (Agenda Item 43)",
+        chair: "Working Group - Chair/Singapore",
+        room: "B.Stork (70)",
+        notes: "WG"
+      },
+      {
+        time: "17:15–18:45",
+        type: "sideevent",
+        title: "CMS, CITES and Sharks",
+        chair: "Convention on the Conservation of Migratory Species (with support of the Sharks MOU Advisory Committee)",
+        room: "S.Falcon (70)",
+        notes: "Side event"
+      },
+      {
+        time: "17:15–18:45",
+        type: "sideevent",
+        title: "CITES and Local Voices",
+        chair: "BirdLife International, in collaboration with the governments of … , and Mandai Nature",
+        room: "C.A.Tortoise (40)",
+        notes: "Side event"
+      },
+      {
+        time: "17:15–18:45",
+        type: "sideevent",
+        title: "Fish Maw Trade Impacts",
+        chair: "Animal Welfare Institute. Co-hosts: BLOOM HK, Center for … Conservation Society.",
+        room: "Markhor S. (70)",
+        notes: "Side event"
+      },
+      {
+        time: "17:15–18:45",
+        type: "sideevent",
+        title: "Wildlife Economy",
+        chair: "The international Council for Game and Wildlife Conservation (CIC) in cooperation with the Wildlife Conservation Trust - India and the African Community of Practice / Sustainable use Programs of the IUCN Commission on Ecosystem Management and the IUCN World Commissions on Environmental Law, and Global Hunting for Sustainable Unity – an alliance of national hunting organizations Network",
+        room: "Bukahra D. (120)",
+        notes: "Side event"
+      },
+      {
+        time: "17:15–18:45",
+        type: "committee",
+        title: "Working Group on Paubrasilia echinata (Agenda Item 97 & Prop 46)",
+        chair: "Working Group - Chair/Canada",
+        room: "Eulophia D. (70)",
+        notes: "WG"
+      },
+      {
+        time: "18:15–19:00",
+        type: "sideevent",
+        title: "CGYN",
+        chair: "CITES Secretariat",
+        room: "S. Leopard (32)",
+        notes: "Other"
+      },
+      {
+        time: "18:15–19.30",
+        type: "sideevent",
+        title: "CITES Secretariat Meeting",
+        chair: "CITES Secretariat Meeting",
+        room: "Caracal (Press)",
+        notes: "Other"
+      },
+      {
+        time: "19:00–20:30",
+        type: "sideevent",
+        title: "Enforcement in action",
+        chair: "Wildlife Justice Commission. Event co-hosted by Nigeria.",
+        room: "Markhor S. (70)",
+        notes: "Side event"
+      },
+      {
+        time: "19:00–20:30",
+        type: "sideevent",
+        title: "Progress in and tools for implementing CITES for seahorses.",
+        chair: "IUCN (International Union for Conservation of Nature) - Seahorse, Pipefish & Seadragon Specialist Group",
+        room: "Bukahra D. (120)",
+        notes: "Side event"
+      },
+      {
+        time: "19:00–20:30",
+        type: "sideevent",
+        title: "Civil Society sharing wildlife crime information with law enforcement",
+        chair: "United for Wildlife, the Nature Crime Alliance and INTERPOL",
+        room: "Saiga A. (120)",
+        notes: "Side event"
+      }
+    ];
+
     const scheduleGridContainer = document.getElementById("scheduleGridContainer");
     const emptyState = document.getElementById("emptyState");
-    const scheduleTitle = document.getElementById("scheduleTitle");
-    const scheduleSubtitle = document.getElementById("scheduleSubtitle");
-
-    const dayTabs = document.querySelectorAll("#dayTabs .tab");
     const trackFilter = document.getElementById("trackFilter");
     const searchInput = document.getElementById("searchInput");
-
     const todayBtn = document.getElementById("todayBtn");
-    const tomorrowBtn = document.getElementById("tomorrowBtn");
-
-    // --------------------------------
-    // LOCAL SCHEDULE DATA (edit here)
-    // date = YYYY-MM-DD used for Today/Tomorrow
-    // --------------------------------
-    const scheduleData = {
-      day1: {
-        date: "2025-11-24",
-        title: "Day 1 — Opening",
-        subtitle: "Monday, 24 November 2025",
-        slots: [
-          {
-            time: "09:30–12:30",
-            type: "plenary",
-            title: "Opening of the meeting & adoption of the agenda",
-            chair: "CoP Chair",
-            room: "Plenary Hall",
-            notes: "High-level statements by Parties and observers."
-          },
-          {
-            time: "15:00–18:00",
-            type: "committee",
-            title: "Committee I: Strategic matters",
-            chair: "Committee I Chair",
-            room: "Argali (Com I)",
-            notes: "Strategic vision, work programme and implementation matters."
-          }
-        ]
-      },
-      day2: {
-        date: "2025-11-25",
-        title: "Day 2 — Committees",
-        subtitle: "Tuesday, 25 November 2025",
-        slots: [
-          {
-            time: "09:30–12:30",
-            type: "committee",
-            title: "Committee II: Financial and administrative matters",
-            chair: "Committee II Chair",
-            room: "B. Stork (Com II)",
-            notes: "Budget, staffing and administrative arrangements."
-          },
-          {
-            time: "14:30–17:30",
-            type: "committee",
-            title: "Committee I: Species-specific proposals",
-            chair: "Committee I Chair",
-            room: "Argali (Com I)",
-            notes: "Consideration of listing proposals."
-          }
-        ]
-      },
-      day3: {
-        date: "2025-11-26",
-        title: "Day 3 — Committees & side events",
-        subtitle: "Wednesday, 26 November 2025",
-        slots: [
-          {
-            time: "09:30–12:30",
-            type: "plenary",
-            title: "Plenary: Reports of committees",
-            chair: "CoP President",
-            room: "Plenary Hall",
-            notes: "Reports back from Committees I and II."
-          },
-          {
-            time: "17:15–18:45",
-            type: "sideevent",
-            title: "Side event: CITES and livelihoods",
-            chair: "Organizers",
-            room: "Side-event room",
-            notes: "Panel discussion followed by Q&A."
-          }
-        ]
-      },
-      // extra days so Today/Tomorrow can find 29 Nov, etc.
-      day4: {
-        date: "2025-11-27",
-        title: "Day 4",
-        subtitle: "Thursday, 27 November 2025",
-        slots: [
-          {
-            time: "09:30–12:30",
-            type: "committee",
-            title: "Sessions TBC",
-            chair: "To be confirmed",
-            room: "TBC",
-            notes: "Sessions according to official programme."
-          }
-        ]
-      },
-      day5: {
-        date: "2025-11-28",
-        title: "Day 5",
-        subtitle: "Friday, 28 November 2025",
-        slots: [
-          {
-            time: "09:30–12:30",
-            type: "committee",
-            title: "Sessions TBC",
-            chair: "To be confirmed",
-            room: "TBC",
-            notes: "Sessions according to official programme."
-          }
-        ]
-      },
-      day6: {
-        // THIS IS 29 NOVEMBER – today button will go here on 29/11/2025
-        date: "2025-11-29",
-        title: "Day 6",
-        subtitle: "Saturday, 29 November 2025",
-        slots: [
-          {
-            time: "09:30–12:30",
-            type: "plenary",
-            title: "Plenary / committees (programme TBC)",
-            chair: "CoP President",
-            room: "Plenary Hall",
-            notes: "Please refer to official CITES schedule for exact items."
-          }
-        ]
-      },
-      day7: {
-        date: "2025-11-30",
-        title: "Day 7",
-        subtitle: "Sunday, 30 November 2025",
-        slots: []
-      },
-      day8: {
-        date: "2025-12-01",
-        title: "Day 8",
-        subtitle: "Monday, 1 December 2025",
-        slots: []
-      },
-      day9: {
-        date: "2025-12-02",
-        title: "Day 9",
-        subtitle: "Tuesday, 2 December 2025",
-        slots: []
-      },
-      day10: {
-        date: "2025-12-03",
-        title: "Day 10",
-        subtitle: "Wednesday, 3 December 2025",
-        slots: []
-      },
-      day11: {
-        date: "2025-12-04",
-        title: "Day 11",
-        subtitle: "Thursday, 4 December 2025",
-        slots: []
-      },
-      day12: {
-        date: "2025-12-05",
-        title: "Day 12 — Closing",
-        subtitle: "Friday, 5 December 2025",
-        slots: []
-      }
-    };
-
-    // Build date index: "YYYY-MM-DD" -> "dayN"
-    const dateIndex = {};
-    Object.entries(scheduleData).forEach(([key, day]) => {
-      if (day.date) dateIndex[day.date] = key;
-    });
-
-    let currentDayKey = "day1";
-
-    function findDayKeyByOffset(offsetDays) {
-      const now = new Date();
-      const target = new Date(
-        now.getFullYear(),
-        now.getMonth(),
-        now.getDate() + offsetDays
-      );
-      const iso = target.toISOString().slice(0, 10);
-      return dateIndex[iso] || null;
-    }
-
-    function goToRelativeDay(offsetDays) {
-      const key = findDayKeyByOffset(offsetDays);
-      if (!key) {
-        alert("No schedule found for this date.");
-        return;
-      }
-      currentDayKey = key;
-      dayTabs.forEach(tab => {
-        tab.classList.toggle("is-active", tab.getAttribute("data-day") === key);
-      });
-      renderSchedule();
-    }
 
     function renderSchedule() {
-      const day = scheduleData[currentDayKey];
-      if (!day) {
-        scheduleGridContainer.innerHTML = "";
-        emptyState.textContent = "No schedule found for this day.";
-        emptyState.style.display = "block";
-        return;
-      }
-
-      scheduleTitle.innerHTML = day.title || "";
-      scheduleSubtitle.textContent = day.subtitle || "";
-
       const searchText = (searchInput.value || "").toLowerCase().trim();
       const track = trackFilter.value;
 
-      let slots = day.slots || [];
-      slots = slots.filter(slot => {
+      let slots = scheduleToday.filter(slot => {
         const matchesTrack = track === "all" || slot.type === track;
         const matchesText =
           !searchText ||
           (slot.title && slot.title.toLowerCase().includes(searchText)) ||
           (slot.notes && slot.notes.toLowerCase().includes(searchText)) ||
-          (slot.room && slot.room.toLowerCase().includes(searchText));
+          (slot.room && slot.room.toLowerCase().includes(searchText)) ||
+          (slot.chair && slot.chair.toLowerCase().includes(searchText));
         return matchesTrack && matchesText;
       });
 
-      if (slots.length === 0) {
+      if (!slots.length) {
         scheduleGridContainer.innerHTML = "";
         emptyState.style.display = "block";
-        emptyState.textContent = "No sessions match your filters. Try changing the day, type, or search text.";
         return;
       }
 
@@ -948,7 +934,6 @@
       slots.forEach(slot => {
         const row = document.createElement("div");
         row.className = "schedule-row";
-        row.setAttribute("data-type", slot.type);
 
         const timeCell = document.createElement("div");
         timeCell.className = "schedule-cell";
@@ -967,8 +952,12 @@
           slot.type === "plenary"
             ? "Plenary"
             : slot.type === "committee"
-            ? "Committee"
+            ? "Committee / WG"
             : "Side event";
+
+        const chairText = slot.chair && slot.chair.trim().length
+          ? slot.chair
+          : "Chair / organizer TBC";
 
         sessionCell.innerHTML = `
           <div class="slot-type ${typeClass}">
@@ -977,7 +966,7 @@
           </div>
           <div class="slot-title">${slot.title || ""}</div>
           <div class="slot-meta">
-            <span>${slot.chair || "Chair TBC"}</span>
+            <span>${chairText}</span>
           </div>
         `;
 
@@ -998,27 +987,12 @@
       scheduleGridContainer.appendChild(grid);
     }
 
-    // Tab click handlers
-    dayTabs.forEach(tab => {
-      tab.addEventListener("click", () => {
-        dayTabs.forEach(t => t.classList.remove("is-active"));
-        tab.classList.add("is-active");
-        currentDayKey = tab.getAttribute("data-day");
-        renderSchedule();
-      });
-    });
-
-    // Filters
+    // Events
     trackFilter.addEventListener("change", renderSchedule);
     searchInput.addEventListener("input", renderSchedule);
+    todayBtn.addEventListener("click", renderSchedule);
 
-    // Today / Tomorrow buttons
-    todayBtn.addEventListener("click", () => goToRelativeDay(0));
-    tomorrowBtn.addEventListener("click", () => goToRelativeDay(1));
-
-    // Initial render (default to today if possible)
-    const todayKey = findDayKeyByOffset(0);
-    if (todayKey) currentDayKey = todayKey;
+    // Initial render
     renderSchedule();
   </script>
 </body>
