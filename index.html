@@ -540,6 +540,57 @@
       text-decoration: underline;
     }
 
+    /* CURRENT / NEXT HIGHLIGHT */
+    .slot-row--current .schedule-cell {
+      background: radial-gradient(circle at top left, rgba(34, 197, 94, 0.25), rgba(15, 23, 42, 1));
+      border-top-color: rgba(34, 197, 94, 0.7);
+    }
+
+    .slot-row--next .schedule-cell {
+      background: radial-gradient(circle at top left, rgba(56, 189, 248, 0.18), rgba(15, 23, 42, 1));
+      border-top-color: rgba(56, 189, 248, 0.7);
+    }
+
+    .slot-row--current .slot-time,
+    .slot-row--current .slot-title {
+      color: #ecfccb;
+    }
+
+    .slot-row--next .slot-time,
+    .slot-row--next .slot-title {
+      color: #e0f2fe;
+    }
+
+    .slot-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 7px;
+      border-radius: 999px;
+      font-size: 0.68rem;
+      vertical-align: middle;
+      margin-left: 6px;
+    }
+
+    .slot-status-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: currentColor;
+    }
+
+    .slot-status--current {
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.7);
+      color: #bbf7d0;
+    }
+
+    .slot-status--next {
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.7);
+      color: #bae6fd;
+    }
+
     @media (max-width: 900px) {
       body {
         padding: 12px;
@@ -1006,20 +1057,123 @@
     const searchInput = document.getElementById("searchInput");
     const todayBtn = document.getElementById("todayBtn");
 
-    function renderSchedule() {
+    // ===== TIME PARSING & FLAGS (current / next) =====
+    function parseTimeRange(range) {
+      if (!range) {
+        return { start: 0, end: 24 * 60 };
+      }
+      const parts = range.split("–");
+      if (parts.length !== 2) {
+        return { start: 0, end: 24 * 60 };
+      }
+
+      function parsePart(p) {
+        p = p.trim().replace(".", ":");
+        const segments = p.split(":");
+        const h = parseInt(segments[0], 10) || 0;
+        const m = parseInt(segments[1], 10) || 0;
+        return h * 60 + m;
+      }
+
+      const start = parsePart(parts[0]);
+      let end = parsePart(parts[1]);
+
+      // Avoid zero-length or negative intervals
+      if (!Number.isFinite(end) || end <= start) {
+        end = start + 30; // default 30 minutes
+      }
+      return { start, end };
+    }
+
+    function getNowMinutes() {
+      const now = new Date();
+      return now.getHours() * 60 + now.getMinutes();
+    }
+
+    // Precompute times
+    scheduleToday.forEach(slot => {
+      const { start, end } = parseTimeRange(slot.time);
+      slot.startMinutes = start;
+      slot.endMinutes = end;
+    });
+
+    // ===== FILTER + TIME-BASED VIEW (hide past) =====
+    function getFilteredSlots() {
       const searchText = (searchInput.value || "").toLowerCase().trim();
       const track = trackFilter.value;
+      const nowMinutes = getNowMinutes();
 
       let slots = scheduleToday.filter(slot => {
+        // Hide past items: end time before "now"
+        const isFutureOrCurrent = slot.endMinutes >= nowMinutes;
+
         const matchesTrack = track === "all" || slot.type === track;
+
         const matchesText =
           !searchText ||
           (slot.title && slot.title.toLowerCase().includes(searchText)) ||
           (slot.notes && slot.notes.toLowerCase().includes(searchText)) ||
           (slot.room && slot.room.toLowerCase().includes(searchText)) ||
           (slot.chair && slot.chair.toLowerCase().includes(searchText));
-        return matchesTrack && matchesText;
+
+        return isFutureOrCurrent && matchesTrack && matchesText;
       });
+
+      // Sort by start time
+      slots.sort((a, b) => a.startMinutes - b.startMinutes);
+
+      // Reset flags
+      slots.forEach(s => {
+        s._isCurrent = false;
+        s._isNext = false;
+      });
+
+      // Mark current and next
+      const now = nowMinutes;
+      let currentIdx = -1;
+      let nextIdx = -1;
+
+      for (let i = 0; i < slots.length; i++) {
+        const s = slots[i];
+        if (s.startMinutes <= now && now < s.endMinutes) {
+          currentIdx = i;
+          break;
+        }
+      }
+      if (currentIdx === -1) {
+        for (let i = 0; i < slots.length; i++) {
+          if (slots[i].startMinutes > now) {
+            nextIdx = i;
+            break;
+          }
+        }
+      } else {
+        for (let i = currentIdx + 1; i < slots.length; i++) {
+          if (slots[i].startMinutes >= now) {
+            nextIdx = i;
+            break;
+          }
+        }
+      }
+
+      if (currentIdx !== -1) {
+        slots[currentIdx]._isCurrent = true;
+      }
+      if (nextIdx !== -1) {
+        slots[nextIdx]._isNext = true;
+      }
+
+      return { slots, currentIdx, nextIdx };
+    }
+
+    // ===== PAGING / SLIDES =====
+    let currentPage = 0;
+    const pageSize = 9; // max items per slide
+    let autoRotateId = null;
+    const autoRotateMs = 20000; // 20 seconds per slide
+
+    function renderSchedule(page = 0) {
+      const { slots } = getFilteredSlots();
 
       if (!slots.length) {
         scheduleGridContainer.innerHTML = "";
@@ -1028,6 +1182,15 @@
       }
 
       emptyState.style.display = "none";
+
+      const totalPages = Math.max(1, Math.ceil(slots.length / pageSize));
+      if (page >= totalPages) {
+        page = 0;
+      }
+      currentPage = page;
+
+      const startIndex = page * pageSize;
+      const pageSlots = slots.slice(startIndex, startIndex + pageSize);
 
       const grid = document.createElement("div");
       grid.className = "schedule-grid";
@@ -1041,9 +1204,15 @@
       `;
       grid.appendChild(headerRow);
 
-      slots.forEach(slot => {
+      pageSlots.forEach(slot => {
         const row = document.createElement("div");
         row.className = "schedule-row";
+
+        if (slot._isCurrent) {
+          row.classList.add("slot-row--current");
+        } else if (slot._isNext) {
+          row.classList.add("slot-row--next");
+        }
 
         const timeCell = document.createElement("div");
         timeCell.className = "schedule-cell";
@@ -1051,6 +1220,7 @@
 
         const sessionCell = document.createElement("div");
         sessionCell.className = "schedule-cell";
+
         const typeClass =
           slot.type === "plenary"
             ? "slot-type--plenary"
@@ -1065,16 +1235,25 @@
             ? "Committee / WG"
             : "Side event";
 
-        const chairText = slot.chair && slot.chair.trim().length
-          ? slot.chair
-          : "Chair / organizer TBC";
+        const chairText =
+          slot.chair && slot.chair.trim().length
+            ? slot.chair
+            : "Chair / organizer TBC";
+
+        const statusPill = slot._isCurrent
+          ? `<span class="slot-status slot-status--current"><span class="slot-status-dot"></span>Now</span>`
+          : slot._isNext
+          ? `<span class="slot-status slot-status--next"><span class="slot-status-dot"></span>Next</span>`
+          : "";
 
         sessionCell.innerHTML = `
           <div class="slot-type ${typeClass}">
             <span class="badge-dot"></span>
             <span>${typeLabel}</span>
           </div>
-          <div class="slot-title">${slot.title || ""}</div>
+          <div class="slot-title">
+            ${slot.title || ""} ${statusPill}
+          </div>
           <div class="slot-meta">
             <span>${chairText}</span>
           </div>
@@ -1097,12 +1276,45 @@
       scheduleGridContainer.appendChild(grid);
     }
 
-    trackFilter.addEventListener("change", renderSchedule);
-    searchInput.addEventListener("input", renderSchedule);
-    todayBtn.addEventListener("click", renderSchedule);
+    function resetAutoRotate() {
+      if (autoRotateId) {
+        clearInterval(autoRotateId);
+      }
+      autoRotateId = setInterval(() => {
+        const { slots } = getFilteredSlots();
+        if (!slots.length) return;
 
-    renderSchedule();
+        const totalPages = Math.max(1, Math.ceil(slots.length / pageSize));
+        currentPage = (currentPage + 1) % totalPages;
+        renderSchedule(currentPage);
+      }, autoRotateMs);
+    }
+
+    // EVENTS
+    trackFilter.addEventListener("change", () => {
+      currentPage = 0;
+      renderSchedule(currentPage);
+      resetAutoRotate();
+    });
+
+    searchInput.addEventListener("input", () => {
+      currentPage = 0;
+      renderSchedule(currentPage);
+      resetAutoRotate();
+    });
+
+    todayBtn.addEventListener("click", () => {
+      // Reset filters to full "today" view
+      trackFilter.value = "all";
+      searchInput.value = "";
+      currentPage = 0;
+      renderSchedule(currentPage);
+      resetAutoRotate();
+    });
+
+    // INITIAL RENDER
+    renderSchedule(0);
+    resetAutoRotate();
   </script>
 </body>
 </html>
-
