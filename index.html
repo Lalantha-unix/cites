@@ -662,6 +662,13 @@
         width: 100%;
         justify-content: flex-start;
       }
+      .clock-label {
+        font-weight: 600;
+        color: #ffffff;
+      }
+
+
+      
     }
   </style>
 </head>
@@ -695,6 +702,11 @@
         </div>
 
         <div class="header-actions">
+            <div class="live-clock" id="liveClock">
+				      <span class="live-clock-dot"></span>
+				      <span class="clock-label">Current time:</span>
+				      <span id="liveClockText">--:--:--</span>
+		    </div>          
           <button class="btn-ghost" type="button" id="todayBtn">
             <span class="btn-icon">📅</span>
             Today’s programme
@@ -1359,3 +1371,4 @@
   </script>
 </body>
 </html>
+
