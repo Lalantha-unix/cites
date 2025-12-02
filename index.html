@@ -155,6 +155,31 @@
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
+      align-items: center;
+      justify-content: flex-end;
+    }
+
+    /* LIVE CLOCK */
+    .live-clock {
+      border-radius: 999px;
+      padding: 6px 12px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(20px);
+      white-space: nowrap;
+    }
+
+    .live-clock-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      background: #22c55e;
+      box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
     }
 
     .btn-primary {
@@ -661,14 +686,17 @@
       .header-actions {
         width: 100%;
         justify-content: flex-start;
-      }
-      .clock-label {
-        font-weight: 600;
-        color: #ffffff;
+        gap: 8px;
       }
 
-
-      
+      .live-clock {
+        order: -1;
+      }
+	  .clock-label {
+		font-weight: 600;
+		color: #ffffff;
+	  }
+	
     }
   </style>
 </head>
@@ -702,11 +730,11 @@
         </div>
 
         <div class="header-actions">
-            <div class="live-clock" id="liveClock">
-				      <span class="live-clock-dot"></span>
-				      <span class="clock-label">Current time:</span>
-				      <span id="liveClockText">--:--:--</span>
-		    </div>          
+          <div class="live-clock" id="liveClock">
+				<span class="live-clock-dot"></span>
+				<span class="clock-label">Current time:</span>
+				<span id="liveClockText">--:--:--</span>
+		  </div>
           <button class="btn-ghost" type="button" id="todayBtn">
             <span class="btn-icon">📅</span>
             Today’s programme
@@ -821,6 +849,25 @@
       if (subtitle) {
         subtitle.textContent = formatted;
       }
+    })();
+
+    // ---------- 1b. LIVE CLOCK ----------
+    (function startLiveClock() {
+      const clockSpan = document.getElementById("liveClockText");
+      if (!clockSpan) return;
+
+      function updateClock() {
+        const now = new Date();
+        const timeString = now.toLocaleTimeString("en-GB", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit"
+        });
+        clockSpan.textContent = timeString;
+      }
+
+      updateClock();
+      setInterval(updateClock, 1000);
     })();
 
     // ---------- 2. SCHEDULE DATA ----------
@@ -1313,26 +1360,6 @@
       }, autoRotateMs);
     }
 
-	  // ---------- LIVE CLOCK ----------
-		(function startLiveClock() {
-		  const clockSpan = document.getElementById("liveClockText");
-		  if (!clockSpan) return;
-		
-		  function updateClock() {
-		    const now = new Date();
-		    const timeString = now.toLocaleTimeString("en-GB", {
-		      hour: "2-digit",
-		      minute: "2-digit",
-		      second: "2-digit"
-		    });
-		    clockSpan.textContent = timeString;
-		  }
-		
-		  updateClock();            // set immediately
-		  setInterval(updateClock, 1000);  // update every second
-		})();
-
-
     // ---------- 6. LOAD DATA FROM sl1.cop20.live ----------
     async function loadSchedule() {
       try {
@@ -1391,5 +1418,3 @@
   </script>
 </body>
 </html>
-
-
