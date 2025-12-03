@@ -182,6 +182,31 @@
       box-shadow: 0 0 10px rgba(34, 197, 94, 0.9);
     }
 
+    .clock-label {
+      font-weight: 600;
+      color: #ffffff;
+    }
+
+    /* NEXT REFRESH TIMER */
+    .next-refresh {
+      border-radius: 999px;
+      padding: 6px 12px;
+      border: 1px solid rgba(148, 163, 184, 0.6);
+      background: rgba(15, 23, 42, 0.9);
+      color: var(--text-soft);
+      font-size: 0.78rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      backdrop-filter: blur(20px);
+      white-space: nowrap;
+    }
+
+    .next-refresh-label {
+      font-weight: 600;
+      color: #ffffff;
+    }
+
     .btn-primary {
       border-radius: 999px;
       padding: 8px 16px;
@@ -692,11 +717,6 @@
       .live-clock {
         order: -1;
       }
-	  .clock-label {
-		font-weight: 600;
-		color: #ffffff;
-	  }
-	
     }
   </style>
 </head>
@@ -731,10 +751,16 @@
 
         <div class="header-actions">
           <div class="live-clock" id="liveClock">
-				<span class="live-clock-dot"></span>
-				<span class="clock-label">Current time:</span>
-				<span id="liveClockText">--:--:--</span>
-		  </div>
+            <span class="live-clock-dot"></span>
+            <span class="clock-label">Current time:</span>
+            <span id="liveClockText">--:--:--</span>
+          </div>
+
+          <div class="next-refresh">
+            <span class="next-refresh-label">Next refresh:</span>
+            <span id="nextRefreshText">--:--:--</span>
+          </div>
+
           <button class="btn-ghost" type="button" id="todayBtn">
             <span class="btn-icon">📅</span>
             Today’s programme
@@ -869,6 +895,31 @@
       updateClock();
       setInterval(updateClock, 1000);
     })();
+
+    // ---------- 1c. AUTO REFRESH EVERY 10 MIN ----------
+    const REFRESH_INTERVAL_MS = 10 * 60 * 1000; // 10 minutes
+    let nextRefreshTime = null;
+
+    function updateNextRefreshDisplay() {
+      const el = document.getElementById("nextRefreshText");
+      if (!el || !nextRefreshTime) return;
+      el.textContent = nextRefreshTime.toLocaleTimeString("en-GB", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit"
+      });
+    }
+
+    function scheduleAutoRefresh() {
+      const now = new Date();
+      nextRefreshTime = new Date(now.getTime() + REFRESH_INTERVAL_MS);
+      updateNextRefreshDisplay();
+
+      setTimeout(() => {
+        loadSchedule();
+        scheduleAutoRefresh();
+      }, REFRESH_INTERVAL_MS);
+    }
 
     // ---------- 2. SCHEDULE DATA ----------
     let scheduleToday = [];
@@ -1415,6 +1466,7 @@
 
     // ---------- 8. INITIAL LOAD ----------
     loadSchedule();
+    scheduleAutoRefresh();
   </script>
 </body>
 </html>
